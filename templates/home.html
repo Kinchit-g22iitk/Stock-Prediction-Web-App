@@ -1,1 +1,38 @@
- 
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+       <meta charset="utf-8">
+       <title>Stock Price Predictor</title>
+       <link rel="stylesheet" href="..\static\styles.css">
+   </head>
+   <body>
+       <nav>
+           <a href="../templates/home.html">Home</a>
+           <a href="/about/">About</a>
+           <a href="../templates/home.html">Source</a>
+       </nav>
+       <div class="container">
+           <h1>Stock Predictor</h1>
+           <form action="target_page.html" method="post"> <!-- Set the target page URL here -->
+               <div class="input-section">
+                   <label for="stockName">Stock Name:</label>
+                   <input type="text" id="stockName" name="stockName" placeholder="Enter stock name..." list="stockNames">
+                   <datalist id="stockNames">
+                       <option value="AAPL">
+                       <option value="GOOGL">
+                       <option value="AMZN">
+                       <option value="MSFT">
+                       <option value="TSLA">
+                   </datalist>
+                   <br>
+                   <br>
+                   <label for="numOfDays">Number of Days:</label>
+                   <input type="number" id="numOfDays" name="numOfDays" placeholder="Enter number of days">
+                   <br>
+                   <br>
+                   <input type="submit" value="Submit" style="cursor: pointer;">
+               </div>
+           </form>
+       </div>
+   </body>
+</html>
