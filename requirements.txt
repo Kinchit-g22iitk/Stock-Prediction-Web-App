@@ -1,0 +1,9 @@
+numpy
+pandas
+Flask
+docx
+tensorflow
+matplotlib
+scikit-learn
+yfinance
+# -e .
