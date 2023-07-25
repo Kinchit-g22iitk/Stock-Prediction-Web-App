@@ -42,7 +42,7 @@ class BidirectionalRNN(keras.Model):
         return x
 
     
-class RNN_Model():
+class BidirectionalRNN_Model():
     def __init__(self, num_days) -> None:
         try:
             self.num_days = num_days
