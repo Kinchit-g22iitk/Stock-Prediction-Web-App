@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+       <meta charset="utf-8">
+       <title>Stock Price Predictor</title>
+       <link rel="stylesheet" href="..\static\styles.css">
+   </head>
+   <body>
+       <nav>
+           <a href="../templates/home.html">Home</a>
+           <a href="/about/">About</a>
+           <a href="../templates/source.html">Source</a>
+       </nav>
+       <div class="container">
+           <h1>Stock Predictor</h1>
+           <form method="POST" action="{{ url_for('predict') }}"> <!-- Set the predict page URL here -->
+               <div class="input-section">
+                   <label for="stockName">Stock Name:</label>
+                   <input type="text" id="stockName" name="stockName" placeholder="Enter stock name..." list="stockNames">
+                   <datalist id="stockNames">
+                       <option value="AAPL">
+                       <option value="GOOGL">
+                       <option value="AMZN">
+                       <option value="MSFT">
+                       <option value="TSLA">
+                   </datalist>
+                   <br>
+                   <br>
+                   <label for="numOfDays">Number of Days:</label>
+                   <input type="number" id="numOfDays" name="numOfDays" placeholder="Enter number of days">
+                   <br>
+                   <br>
+                   <label for="modelNames">Model Name:</label>
+                   <input type="text" name="model_type" id="modelNames" placeholder="Enter model name..." list="modelName" style="cursor: pointer;">
+                   <datalist id="modelName">
+                       <option value="GRU">
+                       <option value="LSTM">
+                       <option value="RNN">
+                        <option value="Bidirectional-RNN">
+                        <option value="Encoder-model">
+                   </datalist>
+                   <br>
+                   <br>
+                   <input type="submit" value="Submit" style="cursor: pointer;">
+               </div>
+           </form>
+       </div>
+
+        {% if img_data %}
+        <img src="data:image/jpeg;base64,{{ img_data }}" id="stockdataimage">
+        <h2>The result for {{model_type}} model is {{result}}</h2   >
+        {% endif %}
+        
+
+   </body>
+</html>
