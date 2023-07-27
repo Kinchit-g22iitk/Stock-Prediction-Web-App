@@ -9,7 +9,7 @@
        <nav>
            <a href="../templates/home.html">Home</a>
            <a href="/about/">About</a>
-           <a href="../templates/home.html">Source</a>
+           <a href="../templates/source.html">Source</a>
        </nav>
        <div class="container">
            <h1>Stock Predictor</h1>
@@ -30,6 +30,17 @@
                    <input type="number" id="numOfDays" name="numOfDays" placeholder="Enter number of days">
                    <br>
                    <br>
+                   <label for="modelNames">Model Name:</label>
+                   <input type="text" name="model_type" id="modelNames" placeholder="Enter model name..." list="modelName" style="cursor: pointer;">
+                   <datalist id="modelName">
+                       <option value="GRU">
+                       <option value="LSTM">
+                       <option value="RNN">
+                        <option value="Bidirectional-RNN">
+                        <option value="Encoder-model">
+                   </datalist>
+                   <br>
+                   <br>
                    <input type="submit" value="Submit" style="cursor: pointer;">
                </div>
            </form>
@@ -37,8 +48,9 @@
 
         {% if img_data %}
         <img src="data:image/jpeg;base64,{{ img_data }}" id="stockdataimage">
-        <h1>The result for gru model is {{result}}</h1>
+        <h2>The result for {{model_type}} model is {{result}}</h2   >
         {% endif %}
+        
 
    </body>
 </html>
