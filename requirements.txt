@@ -4,5 +4,4 @@ Flask
 matplotlib
 scikit-learn
 yfinance
-tensorflow
 # -e .

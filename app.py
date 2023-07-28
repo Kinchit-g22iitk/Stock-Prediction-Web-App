@@ -60,6 +60,7 @@ def predict():
         # print(model.test(test_x, test_y))
 
         result = model.prediction(input_sequences, targets, prediction_data)
+        print(result.shape)
         result = dataProcessing.inverse_transform(result,numDays)
         
         return render_template('home.html', img_data=encoded_img_data.decode('utf-8'), result=result)
