@@ -1,5 +1,6 @@
 from flask import Flask,request,render_template
 
+
 from src.stockdata import StockData
 from src.data_processing import DataProcessing
 from src.models.gru import GRU_Model
@@ -7,11 +8,13 @@ from src.models.lstm import LSTM_Model
 from src.models.simple_rnn import RNN_Model
 from src.models.bidirectional_rnn import BidirectionalRNN_Model
 from src.models.encoder import Encoder_Model
+from src.get_graphs import get_graphs
 
 from PIL import Image
 import base64
 import io
 
+import numpy as np
 app = Flask(__name__)
 
 @app.route('/')
@@ -60,11 +63,29 @@ def predict():
 
         model.train(train_x, train_y)
         # print(model.test(test_x, test_y))
+        pred = model.Predict(test_x)
 
+        for i in range(numDays):
+            pred[:,i,:]=dataProcessing.inv_transform(pred[:,i,:])
+        graphs= get_graphs(pred,test_y)
+        print(graphs)
         result = model.prediction(input_sequences, targets, prediction_data)
-        result = dataProcessing.inverse_transform(result,numDays)
+        l = []
+        for i in graphs:
+            im = Image.open(i)
+            data = io.BytesIO()
+            im.save(data, "JPEG")
+            encoded_img_data = base64.b64encode(data.getvalue())
+            l.append(encoded_img_data)
+        result = np.array([dataProcessing.inverse_transform(result,numDays)])
+        print(result.shape)
         
-        return render_template('home.html', img_data=encoded_img_data.decode('utf-8'), result=result)
+        
+        new_graphs = []
+        for i in result[0]:
+            new_graphs.append(i[4])
+        
+        return render_template('home.html', img_data=encoded_img_data.decode('utf-8'), results=l, graphs_location=new_graphs)
     
 if __name__=="__main__":
     app.run(port=8000,debug=True)
