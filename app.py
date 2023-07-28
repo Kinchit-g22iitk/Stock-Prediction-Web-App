@@ -24,7 +24,9 @@ def predict():
         return render_template('home.html')
     else:
         stockName = request.form.get('stockName')
+        print(stockName)
         numDays = int(request.form.get('numOfDays'))
+        print(numDays)
         model_type = request.form.get('model_type')
         stockData = StockData()
         df = stockData.getStockData(tickerSymbol=stockName,startDate='2015-6-1',endDate='2023-6-15')

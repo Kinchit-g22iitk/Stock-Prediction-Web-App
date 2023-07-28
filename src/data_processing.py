@@ -50,6 +50,7 @@ class DataProcessing():
         logging.info('Generating data for prediction.')
         prediction_data = self.data[-10:]
         return np.array([prediction_data])
+    
     def inverse_transform(self,res,ndays):
         logging.info('Doing inverse tranform of obtained output')
         res = res.reshape(ndays,5)
