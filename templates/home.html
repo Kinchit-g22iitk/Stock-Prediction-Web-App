@@ -49,7 +49,7 @@
                 <h2 id ="moveLeft">Historical Stock Price data</h2>
                 <img src="data:image/jpeg;base64,{{ img_data }}" id="stockdataimage">
                 <hr>
-                <h3 id ="moveLeft">Model {{model_type}} predicts the following {{results}}:</h3>
+                <h3 id ="moveLeft">Model {{model_type}} predicts the following {{graphs_location}} {{results}}:</h3>
                 <table id="table" style="width:100%;border: 1px solid white; justify-content: space-between;">
                     <tr>
                         <th>Date</th>
@@ -58,8 +58,11 @@
                         <th>% Change</th>
                     </tr>
                 </table>
-
+                <div id="images"></div>
            </div>
+           {% for graph in graphs_location %}
+                <img src="data:image/jpeg;base64,{{ graph }}" id="stockdataimage">
+           {% endfor %}
            {% endif %}
        </div>
 
@@ -111,6 +114,7 @@
 
         // Call the updateEndDate function when the numOfDays input changes
         document.getElementById('numOfDays').addEventListener('input', updateEndDate);
+            
     </script>
         
 

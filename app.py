@@ -65,18 +65,20 @@ def predict():
         # print(model.test(test_x, test_y))
         pred = model.Predict(test_x)
 
-        for i in range(numDays):
-            pred[:,i,:]=dataProcessing.inv_transform(pred[:,i,:])
+        # for i in range(numDays):
+        #     pred[:,i,:]=dataProcessing.inv_transform(pred[:,i,:])
         graphs= get_graphs(pred,test_y)
         print(graphs)
-        result = model.prediction(input_sequences, targets, prediction_data)
+
         l = []
         for i in graphs:
             im = Image.open(i)
             data = io.BytesIO()
             im.save(data, "JPEG")
-            encoded_img_data = base64.b64encode(data.getvalue())
-            l.append(encoded_img_data)
+            encoded_img_data2 = base64.b64encode(data.getvalue())
+            l.append(encoded_img_data2.decode('utf-8'))
+
+        result = model.prediction(input_sequences, targets, prediction_data)
         result = np.array([dataProcessing.inverse_transform(result,numDays)])
         print(result.shape)
         
@@ -85,7 +87,7 @@ def predict():
         for i in result[0]:
             new_graphs.append(i[4])
         
-        return render_template('home.html', img_data=encoded_img_data.decode('utf-8'), results=l, graphs_location=new_graphs)
+        return render_template('home.html', img_data=encoded_img_data.decode('utf-8'), graphs_location=l, results=new_graphs)
     
 if __name__=="__main__":
     app.run(port=8000,debug=True)
