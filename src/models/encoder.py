@@ -12,36 +12,67 @@ warnings.filterwarnings('ignore')
 
 from src.models.time2vec import Time2Vec
 
-class Encoder(keras.Model):
-    def __init__(self,num_days,num_hid,time_steps,num_head,kernel_size):
+class TransformerEncoder(layers.Layer):
+    def __init__(self, num_heads=2, embed_dim=8, feed_forward_dim=16, rate=0.1):
+        super().__init__()
+
+        self.attn = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
+        self.ffn = keras.Sequential([layers.Dense(feed_forward_dim, activation="relu"),
+                                     layers.Dense(16,activation="relu"),
+                                     layers.Dense(embed_dim),])
+
+        self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
+        self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
+        self.dropout1 = layers.Dropout(rate)
+        self.dropout2 = layers.Dropout(rate)
+
+    def call(self, inputs, training):
+        attn_output = self.attn(inputs, inputs)
+        attn_output = self.dropout1(attn_output, training=training)
+        out1 = self.layernorm1(inputs + attn_output)
+        ffn_output = self.ffn(out1)
+        ffn_output = self.dropout2(ffn_output, training=training)
+        return self.layernorm2(out1 + ffn_output)
+
+class T2VTransformer(keras.Model):
+    def __init__(self,num_days, num_hid=5,time_steps=10,num_head=2,kernel_size=3,num_feed_forward=16,num_layers_enc=3, rate=0.1):
 
         super().__init__()
-        self.num_days = num_days
         self.num_hid = num_hid
+        self.num_days = num_days
+        self.numlayers_enc = num_layers_enc
         self.input_layer = layers.Input((time_steps, self.num_hid))
         self.time2vec = Time2Vec(kernel_size = kernel_size)
-        self.encoder_input = layers.Input((time_steps, self.num_hid + kernel_size))
+        self.enc_input = layers.Input((time_steps, self.num_hid + kernel_size))
 
         self.encoder = keras.Sequential(
-            [
-                self.encoder_input,
-                layers.LSTM(units = 256),
-                layers.Dense(units = 150),
-                layers.RepeatVector(256),
-                layers.LSTM(units = 256),
-                layers.Dense(units=num_days*num_hid, activation='linear'),
+            [self.enc_input]
+            + [
+                TransformerEncoder(num_heads=num_head,embed_dim= self.num_hid + kernel_size, feed_forward_dim=num_feed_forward)
+                for _ in range(num_layers_enc)
             ]
         )
+        self.GlobalAveragePooling1D = layers.GlobalAveragePooling1D(data_format='channels_last')
+        self.dropout1 = layers.Dropout(rate)
+        self.dropout2 = layers.Dropout(rate)
+        self.out1 = layers.Dense(units=64, activation='linear')
+        self.out2 = layers.Dense(units=num_hid*self.num_days, activation='linear')
 
     def call(self, inputs):
         x1 = inputs
         x2 = self.time2vec(x1)
         x = tf.concat([x1,x2], axis=2)
+
         x = self.encoder(x)
 
+        x = self.GlobalAveragePooling1D(x)
+        x = self.dropout1(x)
+        x = self.out1(x)
+        x = self.dropout2(x)
+        x = self.out2(x)
         shape = tf.shape(x)
-        first_dim = tf.reduce_prod(shape) // (self.num_days*self.num_hid)
-        x = tf.reshape(x,(first_dim,self.num_days,self.num_hid))
+        first_dim = tf.reduce_prod(shape)//(self.num_days*self.num_hid)
+        x = tf.reshape(x, [first_dim, self.num_days, self.num_hid])
         return x
 
     
@@ -51,7 +82,7 @@ class Encoder_Model():
     def __init__(self, num_days) -> None:
         try:
             self.num_days = num_days
-            self.model = Encoder(num_days=self.num_days,num_hid=5,time_steps=10,kernel_size=3)
+            self.model = T2VTransformer(num_days=self.num_days,num_hid=5,time_steps=10,kernel_size=3)
         except Exception as e:
             logging.info('Failed while initialising Encoder model...')
             raise CustomException(e,sys)
