@@ -55,3 +55,7 @@ class DataProcessing():
         logging.info('Doing inverse tranform of obtained output')
         res = res.reshape(ndays,5)
         return self.scaler.inverse_transform(res)
+    
+    def inv_transform(self,res):
+        logging.info('Doing inverse tranform ')
+        return self.scaler.inverse_transform(res)
