@@ -32,7 +32,8 @@ def predict():
         print(numDays)
         model_type = request.form.get('model_type')
         stockData = StockData()
-        df = stockData.getStockData(tickerSymbol=stockName,startDate='2015-6-1',endDate='2023-6-15')
+        df = stockData.getStockData(tickerSymbol=stockName,time='10y')
+        last_price=df["Close"][-1]
         graph_loc = stockData.getCloseGraph()
 
         im = Image.open(graph_loc)
@@ -86,8 +87,14 @@ def predict():
         new_graphs = []
         for i in result[0]:
             new_graphs.append(i[4])
+        per_change = []
+        for i in range(numDays):
+            if(i==0):
+                per_change.append(100*(new_graphs[0]-last_price)/last_price)
+            else:
+                per_change.append(100*(new_graphs[i]-new_graphs[i-1])/new_graphs[i-1])    
         
-        return render_template('home.html', img_data=encoded_img_data.decode('utf-8'), graphs_location=l, results=new_graphs)
+        return render_template('home.html', img_data=encoded_img_data.decode('utf-8'), graphs_location=l, results=new_graphs, iterations=numDays, change=per_change)
     
 if __name__=="__main__":
     app.run(port=8000,debug=True)
