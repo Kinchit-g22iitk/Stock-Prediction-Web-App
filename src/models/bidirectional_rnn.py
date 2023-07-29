@@ -72,7 +72,9 @@ class BidirectionalRNN_Model():
     def prediction(self,input_sequences, targets, prediction_data):
         logging.info('Stock Price prediction started using Bidirectional RNN Model...')
         try :
-            self.model.fit(input_sequences, targets)
+            opt = tf.keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=True)
+            self.model.compile(optimizer=opt, loss='mse')
+            history = self.model.fit(input_sequences, targets,epochs =3)
             prediction = self.model.predict(prediction_data)
             return prediction
         except Exception as e:

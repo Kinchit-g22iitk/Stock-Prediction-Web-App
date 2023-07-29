@@ -31,6 +31,8 @@ def predict():
         numDays = int(request.form.get('numOfDays'))
         print(numDays)
         model_type = request.form.get('model_type')
+        print(model_type)
+
         stockData = StockData()
         df = stockData.getStockData(tickerSymbol=stockName,time='10y')
         last_price=df["Close"][-1]
@@ -48,9 +50,7 @@ def predict():
         train_x,train_y,test_x,test_y = dataProcessing.get_train_test_data(input_sequences,targets)
         prediction_data = dataProcessing.get_prediction_data()
 
-        # gru_model = GRU_Model(numDays)
-        # gru_model.train(train_x,train_y)
-        # print(gru_model.test(test_x,test_y))
+
         if model_type == 'GRU':
             model = GRU_Model(numDays)
         elif model_type == 'LSTM':
@@ -65,9 +65,13 @@ def predict():
         model.train(train_x, train_y)
         pred = model.Predict(test_x)
 
-        # for i in range(numDays):
-        #     pred[:,i,:]=dataProcessing.inv_transform(pred[:,i,:])
-        graphs= get_graphs(pred,test_y)
+        pred_copy = pred.copy()
+        test_y_copy = test_y.copy()
+        for i in range(numDays):
+            pred_copy[:,i,:]=dataProcessing.inv_transform(pred_copy[:,i,:])
+            test_y_copy[:,i,:]=dataProcessing.inv_transform(test_y_copy[:,i,:])
+        
+        graphs= get_graphs(pred_copy,test_y_copy)
         print(graphs)
 
         l = []
@@ -78,21 +82,24 @@ def predict():
             encoded_img_data2 = base64.b64encode(data.getvalue())
             l.append(encoded_img_data2.decode('utf-8'))
 
-        result = model.prediction(input_sequences, targets, prediction_data)
+        result = np.array(model.prediction(input_sequences, targets, prediction_data))
         result = np.array([dataProcessing.inverse_transform(result,numDays)])
         
-        
-        new_graphs = []
+        print('result has shape {}'.format(result))
+        answers = []
         for i in result[0]:
-            new_graphs.append(i[4])
+            answers.append(i[4])
+        print('answers : {}'.format(answers))
+
+        
         per_change = []
         for i in range(numDays):
             if(i==0):
-                per_change.append(100*(new_graphs[0]-last_price)/last_price)
+                per_change.append(format(100*(answers[0]-last_price)/last_price,".2f"))
             else:
-                per_change.append(100*(new_graphs[i]-new_graphs[i-1])/new_graphs[i-1])    
+                per_change.append(format(100*(answers[i]-answers[i-1])/answers[i-1],".2f"))
         
-        return render_template('home.html', img_data=encoded_img_data.decode('utf-8'), graphs_location=l, results=new_graphs, iterations=numDays, change=per_change)
+        return render_template('home.html',last_price=last_price,img_data=encoded_img_data.decode('utf-8'), graphs_location=l, results=answers, iterations=numDays, change=per_change)
     
 if __name__=="__main__":
     app.run(port=8000,debug=True)

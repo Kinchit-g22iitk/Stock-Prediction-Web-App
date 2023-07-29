@@ -46,10 +46,12 @@
            <div id="resultsTable">
                 <h1 id ="moveLeft">Predictions</h1>
                 <hr>
-                <h2 id ="moveLeft">Historical Stock Price data</h2>
+                <h2 id ="moveLeft">1. Historical Stock Price data</h2>
                 <img src="data:image/jpeg;base64,{{ img_data }}" id="stockdataimage" style="width:600px;height:300px;">
                 <hr>
-                <h3 id ="moveLeft">Model {{model_type}} predicts the following:</h3>
+                <h3 id ="moveLeft">2. The closing price for last day was {{last_price}}</h3>
+                <hr>
+                <h2 id ="moveLeft">3. Model {{model_type}} predicts the following:</h2>
                 <table id="table" style="width:100%;border: 1px solid white; justify-content: space-between;">
                     <tr>
                         <th>Day</th>
@@ -65,11 +67,16 @@
                     {% endfor %}
                 </table>
                 <div id="images"></div>
-           </div>
-           {% for graph in graphs_location %}
-                <img src="data:image/jpeg;base64,{{ graph }}" id="stockdataimage" style="width:600px;height:300px;">
-           {% endfor %}
-           {% endif %}
+           
+                <h2 id ="moveLeft">4. Model performance on the testing data</h2>
+                <hr>
+                {% for graph in graphs_location %}
+                    <img src="data:image/jpeg;base64,{{ graph }}" id="stockdataimage" style="width:600px;height:300px;">
+                    <hr>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
        </div>
 
     <script>

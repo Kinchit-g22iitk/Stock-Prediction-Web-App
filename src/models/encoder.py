@@ -35,7 +35,7 @@ class TransformerEncoder(layers.Layer):
         return self.layernorm2(out1 + ffn_output)
 
 class T2VTransformer(keras.Model):
-    def __init__(self,num_days, num_hid=5,time_steps=10,num_head=2,kernel_size=3,num_feed_forward=128,num_layers_enc=6, rate=0.05):
+    def __init__(self,num_days, num_hid=5,time_steps=10,num_head=4,kernel_size=3,num_feed_forward=128,num_layers_enc=6, rate=0.05):
 
         super().__init__()
         self.num_hid = num_hid
@@ -53,9 +53,8 @@ class T2VTransformer(keras.Model):
             ]
         )
         self.GlobalAveragePooling1D = layers.GlobalAveragePooling1D(data_format='channels_last')
-        self.dropout1 = layers.Dropout(rate)
-        self.dropout2 = layers.Dropout(rate)
-        self.out1 = layers.Dense(units=256, activation='linear')
+        self.dropout = layers.Dropout(rate)
+        self.out1 = layers.Dense(units=128, activation='linear')
         self.out2 = layers.Dense(units=num_hid*self.num_days, activation='linear')
 
     def call(self, inputs):
@@ -66,9 +65,8 @@ class T2VTransformer(keras.Model):
         x = self.encoder(x)
 
         x = self.GlobalAveragePooling1D(x)
-        x = self.dropout1(x)
         x = self.out1(x)
-        x = self.dropout2(x)
+        x = self.dropout(x)
         x = self.out2(x)
         shape = tf.shape(x)
         first_dim = tf.reduce_prod(shape)//(self.num_days*self.num_hid)
@@ -93,7 +91,7 @@ class Encoder_Model():
             opt = tf.keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=True)
             self.model.compile(optimizer=opt, loss='mse')
 
-            history = self.model.fit(train_x,train_y,epochs =5)
+            history = self.model.fit(train_x,train_y,epochs =7)
         except Exception as e:
             logging.info('Failed while training Encoder Model...')
             raise CustomException(e,sys)
@@ -108,7 +106,10 @@ class Encoder_Model():
     def prediction(self,input_sequences, targets, prediction_data):
         logging.info('Stock Price prediction started using Encoder Model...')
         try :
-            self.model.fit(input_sequences, targets)
+            opt = tf.keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=True)
+            self.model.compile(optimizer=opt, loss='mse')
+            history = self.model.fit(input_sequences, targets,epochs =5)
+
             prediction = self.model.predict(prediction_data)
             return prediction
         except Exception as e:

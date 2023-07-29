@@ -56,7 +56,7 @@ class LSTM_Model():
             opt = tf.keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=True)
             self.model.compile(optimizer=opt, loss='mse')
 
-            history = self.model.fit(train_x,train_y,epochs =5)
+            history = self.model.fit(train_x,train_y,epochs =4)
         except Exception as e:
             logging.info('Failed while training LSTM Model...')
             raise CustomException(e,sys)
@@ -71,7 +71,9 @@ class LSTM_Model():
     def prediction(self,input_sequences, targets, prediction_data):
         logging.info('Stock Price prediction started using LSTM Model...')
         try :
-            self.model.fit(input_sequences, targets)
+            opt = tf.keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=True)
+            self.model.compile(optimizer=opt, loss='mse')
+            history = self.model.fit(input_sequences, targets,epochs =3)
             prediction = self.model.predict(prediction_data)
             return prediction
         except Exception as e:

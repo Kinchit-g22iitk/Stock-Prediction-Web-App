@@ -57,6 +57,7 @@ class GRU_Model():
             self.model.compile(optimizer=opt, loss='mse')
 
             history = self.model.fit(train_x,train_y,epochs =5)
+            logging.info(train_x[:5])
         except Exception as e:
             logging.info('Failed while training GRU Model...')
             raise CustomException(e,sys)
@@ -66,12 +67,15 @@ class GRU_Model():
         return self.model.evaluate(test_x,test_y)
 
     def Predict(self, test_x):
+        logging.info('GRU model predicting for previous data...')
         return self.model.predict(test_x)
     
     def prediction(self,input_sequences, targets, prediction_data):
         logging.info('Stock Price prediction started using GRU Model...')
         try :
-            self.model.fit(input_sequences, targets)
+            opt = tf.keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, amsgrad=True)
+            self.model.compile(optimizer=opt, loss='mse')
+            history = self.model.fit(input_sequences, targets,epochs =3)
             prediction = self.model.predict(prediction_data)
             return prediction
         except Exception as e:
