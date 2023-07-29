@@ -13,7 +13,7 @@ warnings.filterwarnings('ignore')
 from src.models.time2vec import Time2Vec
 
 class BidirectionalRNN(keras.Model):
-    def __init__(self,num_days,num_hid,time_steps,num_head,kernel_size):
+    def __init__(self,num_days,num_hid,time_steps,kernel_size):
 
         super().__init__()
         self.num_days = num_days

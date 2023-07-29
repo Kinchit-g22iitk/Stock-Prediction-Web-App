@@ -63,7 +63,6 @@ def predict():
             model = Encoder_Model(numDays)
 
         model.train(train_x, train_y)
-        # print(model.test(test_x, test_y))
         pred = model.Predict(test_x)
 
         # for i in range(numDays):
@@ -81,7 +80,6 @@ def predict():
 
         result = model.prediction(input_sequences, targets, prediction_data)
         result = np.array([dataProcessing.inverse_transform(result,numDays)])
-        print(result.shape)
         
         
         new_graphs = []
