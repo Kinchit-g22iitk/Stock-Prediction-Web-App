@@ -13,10 +13,10 @@ class StockData():
     def __init__(self) -> None:
         logging.info('Stock Data object initialised.')
 
-    def getStockData(self,tickerSymbol,startDate,endDate):
+    def getStockData(self,tickerSymbol,time):
         try :
             tickerData = yf.Ticker(tickerSymbol)
-            self.df = tickerData.history(period='1d', start=startDate, end=endDate)
+            self.df = tickerData.history(period=time,)
             logging.info('Stock data for {} collected.'.format(tickerSymbol))
             return self.df
         except Exception as e:

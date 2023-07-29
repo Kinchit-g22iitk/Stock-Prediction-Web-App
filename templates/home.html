@@ -24,7 +24,7 @@
                        <option value="TSLA">
                     </datalist>
                     <div class="date-inputs">
-                        <input type="number" name="numOfDays" value="{{request.form['numOfDays']}}" placeholder="Enter number of days" min="1" max="7">
+                        <input type="number" name="numOfDays" id="numOfDays" placeholder="Enter number of days" min="1" max="7">
                         <input type="date" id="fromDate" readonly>
                         <input type="date" id="endDate">
                     </div>
@@ -47,21 +47,27 @@
                 <h1 id ="moveLeft">Predictions</h1>
                 <hr>
                 <h2 id ="moveLeft">Historical Stock Price data</h2>
-                <img src="data:image/jpeg;base64,{{ img_data }}" id="stockdataimage">
+                <img src="data:image/jpeg;base64,{{ img_data }}" id="stockdataimage" style="width:600px;height:300px;">
                 <hr>
-                <h3 id ="moveLeft">Model {{model_type}} predicts the following {{graphs_location}} {{results}}:</h3>
+                <h3 id ="moveLeft">Model {{model_type}} predicts the following:</h3>
                 <table id="table" style="width:100%;border: 1px solid white; justify-content: space-between;">
                     <tr>
-                        <th>Date</th>
                         <th>Day</th>
                         <th>Expected Price</th>
                         <th>% Change</th>
                     </tr>
+                    {% for i in range(iterations)%}
+                    <tr>
+                        <th>{{i+1}}</th>
+                        <th>{{results[i]}}</th>
+                        <th>{{change[i]}}</th>
+                    </tr>
+                    {% endfor %}
                 </table>
                 <div id="images"></div>
            </div>
            {% for graph in graphs_location %}
-                <img src="data:image/jpeg;base64,{{ graph }}" id="stockdataimage">
+                <img src="data:image/jpeg;base64,{{ graph }}" id="stockdataimage" style="width:600px;height:300px;">
            {% endfor %}
            {% endif %}
        </div>
