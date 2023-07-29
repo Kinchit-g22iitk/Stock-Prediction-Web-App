@@ -66,6 +66,9 @@ class BidirectionalRNN_Model():
         logging.info('Testing Bidirectional RNN model...')
         return self.model.evaluate(test_x,test_y)
 
+    def Predict(self, test_x):
+        return self.model.predict(test_x)
+    
     def prediction(self,input_sequences, targets, prediction_data):
         logging.info('Stock Price prediction started using Bidirectional RNN Model...')
         try :

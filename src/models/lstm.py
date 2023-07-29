@@ -64,6 +64,9 @@ class LSTM_Model():
     def test(self, test_x, test_y):
         logging.info('Testing LSTM model...')
         return self.model.evaluate(test_x,test_y)
+    
+    def Predict(self, test_x):
+        return self.model.predict(test_x)
 
     def prediction(self,input_sequences, targets, prediction_data):
         logging.info('Stock Price prediction started using LSTM Model...')

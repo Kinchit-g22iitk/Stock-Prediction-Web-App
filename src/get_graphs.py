@@ -7,6 +7,8 @@ from src.logger import logging
 
 def get_graphs(pred, test_y):
     l = []
+    print(pred)
+    print(test_y)
     logging.info('pred has shape {}'.format(pred.shape))
     graphs_loc = os.path.join(folder_path,'graphs')
     for i in range(pred.shape[1]):

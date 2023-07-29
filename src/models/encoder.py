@@ -13,12 +13,12 @@ warnings.filterwarnings('ignore')
 from src.models.time2vec import Time2Vec
 
 class TransformerEncoder(layers.Layer):
-    def __init__(self, num_heads=2, embed_dim=8, feed_forward_dim=16, rate=0.1):
+    def __init__(self, num_heads=2, embed_dim=8, feed_forward_dim=128, rate=0.05):
         super().__init__()
 
         self.attn = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
         self.ffn = keras.Sequential([layers.Dense(feed_forward_dim, activation="relu"),
-                                     layers.Dense(16,activation="relu"),
+                                     layers.Dense(64,activation="relu"),
                                      layers.Dense(embed_dim),])
 
         self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
@@ -35,7 +35,7 @@ class TransformerEncoder(layers.Layer):
         return self.layernorm2(out1 + ffn_output)
 
 class T2VTransformer(keras.Model):
-    def __init__(self,num_days, num_hid=5,time_steps=10,num_head=2,kernel_size=3,num_feed_forward=16,num_layers_enc=3, rate=0.1):
+    def __init__(self,num_days, num_hid=5,time_steps=10,num_head=2,kernel_size=3,num_feed_forward=128,num_layers_enc=6, rate=0.05):
 
         super().__init__()
         self.num_hid = num_hid
@@ -55,7 +55,7 @@ class T2VTransformer(keras.Model):
         self.GlobalAveragePooling1D = layers.GlobalAveragePooling1D(data_format='channels_last')
         self.dropout1 = layers.Dropout(rate)
         self.dropout2 = layers.Dropout(rate)
-        self.out1 = layers.Dense(units=64, activation='linear')
+        self.out1 = layers.Dense(units=256, activation='linear')
         self.out2 = layers.Dense(units=num_hid*self.num_days, activation='linear')
 
     def call(self, inputs):
@@ -101,6 +101,9 @@ class Encoder_Model():
     def test(self, test_x, test_y):
         logging.info('Testing Encoder model...')
         return self.model.evaluate(test_x,test_y)
+    
+    def Predict(self, test_x):
+        return self.model.predict(test_x)
 
     def prediction(self,input_sequences, targets, prediction_data):
         logging.info('Stock Price prediction started using Encoder Model...')
